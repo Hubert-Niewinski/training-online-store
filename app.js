@@ -1,6 +1,12 @@
 const path = require("path");
 const express = require("express");
+const csrf = require("csurf");
+
 const db = require("./database/database");
+const expressSession = require("express-session");
+const createSessionConfig = require("./config/session");
+const addCsrfTokenMiddleware = require("./middlewares/csrf-token");
+const errorHandlerMiddleware = require("./middlewares/error-handler");
 const authRoutes = require("./routes/auth.routes");
 
 const app = express();
@@ -13,7 +19,16 @@ app.use(express.static("public"));
 // middleware to extract data from submitted forms
 app.use(express.urlencoded({ extended: false }));
 
+const sessionConfig = createSessionConfig();
+app.use(expressSession(sessionConfig));
+
+// middleware for CSRF attacks protection
+app.use(csrf());
+app.use(addCsrfTokenMiddleware);
+
 app.use(authRoutes);
+
+app.use(errorHandlerMiddleware);
 
 db.connectToDatabase()
   .then(() => {
