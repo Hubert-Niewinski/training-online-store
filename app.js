@@ -10,3 +10,7 @@ app.set("views", path.join(__dirname, "views"));
 app.use(authRoutes);
 
 app.listen(3000);
+
+function dsadasda() {
+  dsadasf;
+}
