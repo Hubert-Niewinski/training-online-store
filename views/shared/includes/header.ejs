@@ -2,11 +2,14 @@
   <div><a href="/">WDE</a></div>
   <nav>
     <ul>
-      <% if (locals.isAuth) { %> 
-      <li>
-        <button>Logout</button>
-      </li>
-      <% } %> 
+      <% if (locals.isAuth) { %>
+        <li>
+          <form action="/logout" method="POST">
+            <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
+          </form>
+          <button>Logout</button>
+        </li>
+        <% } %>
     </ul>
   </nav>
 </header>
