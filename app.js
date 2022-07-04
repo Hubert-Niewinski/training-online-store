@@ -20,6 +20,7 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 app.use(express.static("public"));
+app.use("/products/assets", express.static("product-data"));
 
 // middleware to extract data from submitted forms
 app.use(express.urlencoded({ extended: false }));
