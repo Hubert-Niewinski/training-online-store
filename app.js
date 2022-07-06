@@ -15,6 +15,7 @@ const authRoutes = require("./routes/auth.routes");
 const productRoutes = require("./routes/products.routes");
 const baseRoutes = require("./routes/base.routes");
 const adminRoutes = require("./routes/admin.routes");
+const cartRoutes = require("./routes/cart.routes");
 
 const app = express();
 
@@ -24,8 +25,9 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.static("public"));
 app.use("/products/assets", express.static("product-data"));
 
-// middleware to extract data from submitted forms
+// middleware to extract data from submitted forms and requests
 app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 
 const sessionConfig = createSessionConfig();
 app.use(expressSession(sessionConfig));
@@ -40,6 +42,7 @@ app.use(checkAuthStatusMiddleware);
 app.use(baseRoutes);
 app.use(authRoutes);
 app.use(productRoutes);
+app.use("/cart", cartRoutes);
 app.use(protectRoutesMiddleware);
 app.use("/admin", adminRoutes);
 
