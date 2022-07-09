@@ -11,6 +11,7 @@ const checkAuthStatusMiddleware = require("./middlewares/check-auth");
 const protectRoutesMiddleware = require("./middlewares/protect-routes");
 const cartMiddleware = require("./middlewares/cart");
 const updateCartPricesMiddleware = require("./middlewares/update-cart-prices");
+const notFoundMiddleware = require("./middlewares/not-found");
 
 const authRoutes = require("./routes/auth.routes");
 const productsRoutes = require("./routes/products.routes");
@@ -24,17 +25,19 @@ const app = express();
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
+// sets public folders
 app.use(express.static("public"));
 app.use("/products/assets", express.static("product-data"));
 
-// middleware to extract data from submitted forms and requests
+// sets middleware to extract data from submitted forms and requests
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
+// creates session
 const sessionConfig = createSessionConfig();
 app.use(expressSession(sessionConfig));
 
-// middleware for CSRF attacks protection
+// sets middleware for CSRF attacks protection
 app.use(csrf());
 
 app.use(cartMiddleware);
@@ -48,9 +51,11 @@ app.use(baseRoutes);
 app.use(authRoutes);
 app.use(productsRoutes);
 app.use("/cart", cartRoutes);
-app.use(protectRoutesMiddleware);
-app.use("/orders", ordersRoutes);
-app.use("/admin", adminRoutes);
+// app.use(protectRoutesMiddleware)
+app.use(protectRoutesMiddleware, ordersRoutes);
+app.use(protectRoutesMiddleware, adminRoutes);
+
+app.use(notFoundMiddleware);
 
 app.use(errorHandlerMiddleware);
 

@@ -5,20 +5,22 @@ const imageUploadMiddleware = require("../middlewares/image-upload");
 
 const router = express.Router();
 
-router.get("/products", adminController.getProducts); // /admin/products
+const basePath = "/admin";
 
-router.get("/products/new", adminController.getNewProduct);
+router.get(basePath + "/products", adminController.getProducts); // /admin/products
 
-router.post("/products", imageUploadMiddleware, adminController.createNewProduct);
+router.get(basePath + "/products/new", adminController.getNewProduct);
 
-router.get("/products/:id", adminController.getUpdateProduct);
+router.post(basePath + "/products", imageUploadMiddleware, adminController.createNewProduct);
 
-router.post("/products/:id", imageUploadMiddleware, adminController.updateProduct);
+router.get(basePath + "/products/:id", adminController.getUpdateProduct);
 
-router.delete("/products/:id", adminController.deleteProduct);
+router.post(basePath + "/products/:id", imageUploadMiddleware, adminController.updateProduct);
 
-router.get("/orders", adminController.getOrders);
+router.delete(basePath + "/products/:id", adminController.deleteProduct);
 
-router.patch("/orders/:id", adminController.updateOrder);
+router.get(basePath + "/orders", adminController.getOrders);
+
+router.patch(basePath + "/orders/:id", adminController.updateOrder);
 
 module.exports = router;

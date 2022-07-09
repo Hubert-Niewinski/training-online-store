@@ -1,0 +1,8 @@
+main.error-section {
+  text-align: center;
+  justify-content: center;
+}
+
+main.error-section p {
+  margin-top: 2rem;
+}
