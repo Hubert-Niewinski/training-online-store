@@ -1,3 +1,6 @@
+const stripe = require("stripe")(env.stripeSecretApiKey);
+
+const env = require("../config/environment");
 const Order = require("../models/order.model");
 const User = require("../models/user.model");
 
@@ -13,6 +16,7 @@ async function getOrders(req, res) {
 }
 
 async function addOrder(req, res, next) {
+  const cart = res.locals.cart;
   let userDocument;
   try {
     userDocument = await User.findById(res.locals.uid);
@@ -20,7 +24,7 @@ async function addOrder(req, res, next) {
     return next(error);
   }
 
-  const order = new Order(req.session.cart, userDocument);
+  const order = new Order(cart, userDocument);
 
   try {
     await order.save();
@@ -31,10 +35,40 @@ async function addOrder(req, res, next) {
 
   req.session.cart = null;
 
-  res.redirect("/orders");
+  const session = await stripe.checkout.sessions.create({
+    // payment_method_types: ["card"],
+    line_items: [
+      {
+        // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: "Test",
+          },
+          unit_amount_decimal: 10.99,
+        },
+        quantity: 1,
+      },
+    ],
+    mode: "payment",
+    success_url: `${env.baseUrl}/orders/success`,
+    cancel_url: `${env.baseUrl}/orders/failure`,
+  });
+
+  res.redirect(303, session.url);
+}
+
+function getSuccess(req, res) {
+  res.render("customer/orders/success");
+}
+
+function getFailure(req, res) {
+  res.render("customer/orders/failure");
 }
 
 module.exports = {
   addOrder: addOrder,
   getOrders: getOrders,
+  getSuccess: getSuccess,
+  getFailure: getFailure,
 };
