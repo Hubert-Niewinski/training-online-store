@@ -1,6 +1,6 @@
+const env = require("../config/environment");
 const stripe = require("stripe")(env.stripeSecretApiKey);
 
-const env = require("../config/environment");
 const Order = require("../models/order.model");
 const User = require("../models/user.model");
 
@@ -37,19 +37,18 @@ async function addOrder(req, res, next) {
 
   const session = await stripe.checkout.sessions.create({
     // payment_method_types: ["card"],
-    line_items: [
-      {
-        // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+    line_items: cart.items.map((item) => {
+      return {
         price_data: {
           currency: "usd",
           product_data: {
-            name: "Test",
+            name: item.product.title,
           },
-          unit_amount_decimal: 10.99,
+          unit_amount: +item.product.price.toFixed(2) * 100, // to get price in cents
         },
-        quantity: 1,
-      },
-    ],
+        quantity: item.quantity,
+      };
+    }),
     mode: "payment",
     success_url: `${env.baseUrl}/orders/success`,
     cancel_url: `${env.baseUrl}/orders/failure`,
